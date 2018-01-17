@@ -63,7 +63,8 @@ int main()
     a = b;
 
     // just to make sure it compiles
-    for (auto const &i : cyc);
+    for (auto const &i : cyc)
+        std::cout << "i: " << i.str << std::endl;
 
     return 0;
 }
