@@ -123,9 +123,19 @@ public:
         return iterator(this, 0);
     }
 
+    const_iterator begin() const noexcept
+    {
+        return const_iterator(this, 0);
+    }
+
     iterator end() noexcept
     {
         return iterator(this, N);
+    }
+
+    const_iterator end() const noexcept
+    {
+        return const_iterator(this, N);
     }
 };
 }
