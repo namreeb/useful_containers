@@ -38,7 +38,7 @@ class PriorityIterator : public std::iterator<std::input_iterator_tag, PriorityE
 private:
     friend class nam::priority<PriorityEntryT, PriorityPriorityT, N>;
 
-    nam::priority<PriorityEntryT, PriorityPriorityT, N> * const _me;
+    nam::priority<PriorityEntryT, PriorityPriorityT, N> * _me;
     std::size_t _idx;
 
     PriorityIterator(nam::priority<PriorityEntryT, PriorityPriorityT, N> *container, std::size_t idx) noexcept : _me(container), _idx(idx) {}

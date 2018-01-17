@@ -39,7 +39,7 @@ class CyclicIterator : public std::iterator<std::input_iterator_tag, CyclicEntry
 private:
     friend class nam::cyclic<CyclicEntryT, N>;
 
-    nam::cyclic<CyclicEntryT, N> * const _me;
+    nam::cyclic<CyclicEntryT, N> * _me;
     std::size_t _idx;
 
     CyclicIterator(nam::cyclic<CyclicEntryT, N> *container, std::size_t idx) noexcept : _me(container), _idx(idx) {}

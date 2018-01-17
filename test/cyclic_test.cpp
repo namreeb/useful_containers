@@ -58,6 +58,10 @@ int main()
 
     std::cout << "size() should be 5: " << cyc.size() << std::endl;
 
+    auto a = cyc.begin();
+    auto b = cyc.end();
+    a = b;
+
     // just to make sure it compiles
     for (auto const &i : cyc);
 

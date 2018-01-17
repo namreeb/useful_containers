@@ -45,5 +45,9 @@ int main()
     for (auto const &i : prio)
         std::cout << "i: " << i << std::endl;
 
+    auto a = prio.begin();
+    auto b = prio.end();
+    a = b;
+
     return 0;
 }
