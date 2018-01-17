@@ -23,6 +23,8 @@
  *
  */
 
+// nam::cyclic is a cyclical, fixed sized ring buffer, similair to boost::circular_buffer which relies on std::array<>
+
 #ifndef __CYCLIC_HPP_
 #define __CYCLIC_HPP_
 

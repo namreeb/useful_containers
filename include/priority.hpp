@@ -23,6 +23,9 @@
  *
  */
 
+// nam::priority is a fixed sized array in which each element has a priority.  insertions ensure that only
+// the highest priority elements are retained.
+
 #ifndef __PRIORITY_HPP_
 #define __PRIORITY_HPP_
 
