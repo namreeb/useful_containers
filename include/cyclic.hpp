@@ -50,7 +50,7 @@ public:
 
     reference operator*() const
     {
-        return _me->operator[](_idx);
+        return (*_me)[_idx];
     }
 
     bool operator == (CyclicIterator<CyclicEntryT, N> const &other) const noexcept
@@ -87,11 +87,11 @@ public:
 
     cyclic() : _filled(false), _curr(0u) {}
 
-    void push_back(const_reference val)
+    void push_back(const_reference val) noexcept
     {
         _raw[_curr] = val;
 
-        if (_curr == _raw.size() - 1)
+        if (_curr == N - 1)
         {
             _filled = true;
             _curr = 0;
@@ -100,18 +100,22 @@ public:
             ++_curr;
     }
 
-    void clear()
+    void clear() noexcept
     {
         _filled = false;
         _curr = 0;
     }
 
-    std::size_t size() const { return _filled ? N : _curr; }
-    bool empty() const { return !_filled && !_curr; }
+    std::size_t size() const noexcept { return _filled ? N : _curr; }
+    bool empty() const noexcept { return !_filled && !_curr; }
 
     reference operator[](std::size_t n)
     {
-        return _raw[_filled ? (_curr + n) % N : n];
+        // we don't want to use modulo here because not all values of n are considered safe
+        if ((n += _curr) >= N)
+            n -= N;
+
+        return _raw[n];
     }
 
     iterator begin() noexcept

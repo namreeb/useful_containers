@@ -66,5 +66,14 @@ int main()
     for (auto const &i : cyc)
         std::cout << "i: " << i.str << std::endl;
 
+    constexpr std::size_t intsize = 10;
+    nam::cyclic<int, intsize> cycint;
+
+    for (auto i = 0u; i < intsize*10; ++i)
+        cycint.push_back(static_cast<int>(i));
+
+    for (auto const &i : cycint)
+        std::cout << "i: " << i << std::endl;
+
     return 0;
 }

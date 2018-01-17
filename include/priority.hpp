@@ -49,7 +49,7 @@ public:
 
     reference operator*() const
     {
-        return _me->operator[](_idx);
+        return (*_me)[_idx];
     }
 
     bool operator == (PriorityIterator<PriorityEntryT, PriorityPriorityT, N> const &other) const noexcept
@@ -76,7 +76,7 @@ private:
     std::size_t _curr;
     std::array<std::pair<P, T>, N> _raw;
 
-    std::size_t find_idx(P prio) const
+    std::size_t find_idx(P prio) const noexcept
     {
         for (auto i = 0u; i < _curr; ++i)
             if (_raw[i].first < prio)
@@ -85,7 +85,7 @@ private:
         return _curr;
     }
 
-    void shift(std::size_t idx)
+    void shift(std::size_t idx) noexcept
     {
         for (auto i = N - 1; i > idx; --i)
             _raw[i] = _raw[i - 1];
@@ -100,7 +100,7 @@ public:
 
     priority() : _curr(0u) {}
 
-    void insert(P prio, const_reference elem)
+    void insert(P prio, const_reference elem) noexcept
     {
         auto const idx = find_idx(prio);
 
@@ -127,9 +127,19 @@ public:
         return iterator(this, 0);
     }
 
+    const_iterator begin() const noexcept
+    {
+        return const_iterator(this, 0);
+    }
+
     iterator end() noexcept
     {
         return iterator(this, N);
+    }
+
+    const_iterator end() const noexcept
+    {
+        return const_iterator(this, N);
     }
 };
 }
