@@ -36,32 +36,41 @@ namespace nam
 {
 template <typename T, std::size_t N> class cyclic;
 
-template <typename CyclicEntryT, std::size_t N>
-class CyclicIterator : public std::iterator<std::input_iterator_tag, CyclicEntryT>
+template <typename CyclicEntryT, std::size_t N, bool is_const>
+class CyclicIterator
 {
 private:
     friend class nam::cyclic<CyclicEntryT, N>;
+    friend class CyclicIterator<CyclicEntryT, N, !is_const>;
 
-    nam::cyclic<CyclicEntryT, N> * _me;
+    std::conditional_t<is_const,
+        const nam::cyclic<CyclicEntryT, N>,
+        nam::cyclic<CyclicEntryT, N>
+    > *_me;
+
     std::size_t _idx;
 
-    CyclicIterator(nam::cyclic<CyclicEntryT, N> *container, std::size_t idx) noexcept : _me(container), _idx(idx) {}
+    CyclicIterator(std::conditional_t<is_const,
+        const nam::cyclic<CyclicEntryT, N>,
+        nam::cyclic<CyclicEntryT, N>
+        > *container, std::size_t idx) noexcept : _me(container), _idx(idx) {}
 
 public:
-    using BaseIteratorT = std::iterator<std::input_iterator_tag, CyclicEntryT>;
-    using reference = typename BaseIteratorT::reference;
+    using value_type = CyclicEntryT;
+    using pointer = std::conditional_t<is_const, const value_type, value_type>*;
+    using reference = std::conditional_t<is_const, const value_type, value_type>&;
 
     reference operator*() const
     {
         return (*_me)[_idx];
     }
 
-    bool operator == (CyclicIterator<CyclicEntryT, N> const &other) const noexcept
+    bool operator == (CyclicIterator const &other) const noexcept
     {
         return _me == other._me && _idx == other._idx;
     }
 
-    bool operator != (CyclicIterator<CyclicEntryT, N> const &other) const noexcept
+    bool operator != (CyclicIterator const &other) const noexcept
     {
         return !(*this == other);
     }
@@ -76,6 +85,7 @@ public:
     {
         _me = other._me;
         _idx = other._idx;
+
     }
 };
 
@@ -91,8 +101,8 @@ public:
     using value_type = T;
     using reference = T&;
     using const_reference = const T&;
-    using iterator = typename CyclicIterator<T, N>;
-    using const_iterator = typename CyclicIterator<T const, N>;
+    using iterator = CyclicIterator<T, N, false>;
+    using const_iterator = CyclicIterator<T const, N, true>;
 
     cyclic() : _filled(false), _curr(0u) {}
 
