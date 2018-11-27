@@ -139,17 +139,13 @@ public:
         new (&_raw[_curr]) T(std::forward<Args>(args)...);
 
         if (_curr == N - 1)
-        {
-            _filled = true;
             _curr = 0;
-        }
         else
             ++_curr;
     }
 
     void clear() noexcept
     {
-        _filled = false;
         _curr = 0;
     }
 
