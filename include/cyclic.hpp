@@ -30,6 +30,7 @@
 
 #include <array>
 #include <memory>
+#include <utility>
 
 namespace nam
 {
@@ -70,6 +71,12 @@ public:
         ++_idx;
         return *this;
     }
+
+    CyclicIterator& operator =(const CyclicIterator &other)
+    {
+        _me = other._me;
+        _idx = other._idx;
+    }
 };
 
 template <typename T, std::size_t N>
@@ -84,14 +91,33 @@ public:
     using value_type = T;
     using reference = T&;
     using const_reference = const T&;
-    using iterator = CyclicIterator<T, N>;
-    using const_iterator = CyclicIterator<T const, N>;
+    using iterator = typename CyclicIterator<T, N>;
+    using const_iterator = typename CyclicIterator<T const, N>;
 
     cyclic() : _filled(false), _curr(0u) {}
 
     void push_back(const_reference val) noexcept
     {
         _raw[_curr] = val;
+
+        if (_curr == N - 1)
+        {
+            _filled = true;
+            _curr = 0;
+        }
+        else
+            ++_curr;
+    }
+
+    void push_back(T&& val) noexcept
+    {
+        emplace_back(std::move(val));
+    }
+
+    template <class... Args>
+    void emplace_back(Args&&... args) noexcept
+    {
+        new (&_raw[_curr]) T({ std::forward<Args>(args)... });
 
         if (_curr == N - 1)
         {
@@ -112,6 +138,15 @@ public:
     bool empty() const noexcept { return !_filled && !_curr; }
 
     reference operator[](std::size_t n)
+    {
+        // we don't want to use modulo here because not all values of n are considered safe
+        if ((n += _curr) >= N)
+            n -= N;
+
+        return _raw[n];
+    }
+
+    const_reference operator[](std::size_t n) const
     {
         // we don't want to use modulo here because not all values of n are considered safe
         if ((n += _curr) >= N)

@@ -27,12 +27,40 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
+#include <array>
 
 struct MyStruct
 {
     int a;
     int b;
     std::string str;
+};
+
+class Store
+{
+private:
+    nam::cyclic<MyStruct, 5> members;
+    std::vector<MyStruct> vec;
+
+public:
+    void Add(int a, int b, std::string &&c)
+    {
+        members.push_back({ a, b, c });
+        vec.push_back({ a, b, c });
+    }
+
+    void DumpAll() const
+    {
+        auto begin = vec.begin();
+        auto b2 = members.begin();
+
+        auto end = vec.end();
+        auto e2 = members.end();
+
+        for (auto const &m : vec)
+            std::cout << m.a << " " << m.b << " " << m.str << std::endl;
+    }
 };
 
 int main()
@@ -61,6 +89,10 @@ int main()
     auto a = cyc.begin();
     auto b = cyc.end();
     a = b;
+
+    Store myStore;
+    myStore.Add(1, 2, "asdf");
+    myStore.DumpAll();
 
     // just to make sure it compiles
     for (auto const &i : cyc)
