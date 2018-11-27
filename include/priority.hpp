@@ -30,37 +30,40 @@
 #define __PRIORITY_HPP_
 
 #include <array>
+#include <type_traits>
 
 namespace nam
 {
-template <typename T, typename P, std::size_t N> class priority;
-
-template <typename PriorityEntryT, typename PriorityPriorityT, std::size_t N>
-class PriorityIterator : public std::iterator<std::input_iterator_tag, PriorityEntryT>
+template <typename PriorityT, bool is_const>
+class PriorityIterator
 {
 private:
-    friend class nam::priority<PriorityEntryT, PriorityPriorityT, N>;
+    friend PriorityT;
+    friend class PriorityIterator<PriorityT, !is_const>;
 
-    nam::priority<PriorityEntryT, PriorityPriorityT, N> * _me;
+    std::conditional_t<is_const, const PriorityT, PriorityT>* _me;
     std::size_t _idx;
 
-    PriorityIterator(nam::priority<PriorityEntryT, PriorityPriorityT, N> *container, std::size_t idx) noexcept : _me(container), _idx(idx) {}
+    PriorityIterator(std::conditional_t<is_const, const PriorityT, PriorityT>* container, std::size_t idx) noexcept : _me(container), _idx(idx) {}
 
 public:
-    using BaseIteratorT = std::iterator<std::input_iterator_tag, PriorityEntryT>;
-    using reference = typename BaseIteratorT::reference;
+    using value_type = typename PriorityT::value_type;
+    using difference_type = std::ptrdiff_t;
+    using pointer = std::conditional_t<is_const, const value_type, value_type>*;
+    using reference = std::conditional_t<is_const, const value_type, value_type>&;
+    using iterator_category = std::input_iterator_tag;
 
     reference operator*() const
     {
         return (*_me)[_idx];
     }
 
-    bool operator == (PriorityIterator<PriorityEntryT, PriorityPriorityT, N> const &other) const noexcept
+    bool operator == (PriorityIterator const &other) const noexcept
     {
         return _me == other._me && _idx == other._idx;
     }
 
-    bool operator != (PriorityIterator<PriorityEntryT, PriorityPriorityT, N> const &other) const noexcept
+    bool operator != (PriorityIterator const &other) const noexcept
     {
         return !(*this == other);
     }
@@ -68,6 +71,13 @@ public:
     PriorityIterator& operator++()
     {
         ++_idx;
+        return *this;
+    }
+
+    PriorityIterator& operator =(const PriorityIterator &other)
+    {
+        _me = other._me;
+        _idx = other._idx;
         return *this;
     }
 };
@@ -81,6 +91,7 @@ private:
 
     std::size_t find_idx(P prio) const noexcept
     {
+        // TODO: binary search
         for (auto i = 0u; i < _curr; ++i)
             if (_raw[i].first < prio)
                 return i;
@@ -98,8 +109,8 @@ public:
     using value_type = T;
     using reference = T&;
     using const_reference = const T&;
-    using iterator = PriorityIterator<T, P, N>;
-    using const_iterator = PriorityIterator<T const, P, N>;
+    using iterator = PriorityIterator<priority, false>;
+    using const_iterator = PriorityIterator<priority, true>;
 
     priority() : _curr(0u) {}
 
@@ -117,6 +128,31 @@ public:
             ++_curr;
     }
 
+    void push_back(T&& val) noexcept
+    {
+        emplace_back(std::move(val));
+    }
+
+    template <class... Args>
+    void emplace_back(Args&&... args) noexcept
+    {
+        new (&_raw[_curr]) T(std::forward<Args>(args)...);
+
+        if (_curr == N - 1)
+        {
+            _filled = true;
+            _curr = 0;
+        }
+        else
+            ++_curr;
+    }
+
+    void clear() noexcept
+    {
+        _filled = false;
+        _curr = 0;
+    }
+
     std::size_t size() const noexcept { return _curr; }
     bool empty() const noexcept { return !_curr; }
 
@@ -127,12 +163,12 @@ public:
 
     iterator begin() noexcept
     {
-        return iterator(this, 0);
+        return iterator(this, static_cast<std::size_t>(0));
     }
 
     const_iterator begin() const noexcept
     {
-        return const_iterator(this, 0);
+        return const_iterator(this, static_cast<std::size_t>(0));
     }
 
     iterator end() noexcept

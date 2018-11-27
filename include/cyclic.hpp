@@ -42,8 +42,7 @@ private:
     friend CyclicT;
     friend class CyclicIterator<CyclicT, !is_const>;
 
-    std::conditional_t<is_const, const CyclicT, CyclicT>*  _me;
-
+    std::conditional_t<is_const, const CyclicT, CyclicT>* _me;
     std::size_t _idx;
 
     CyclicIterator(std::conditional_t<is_const, const CyclicT, CyclicT>* container, std::size_t idx) noexcept : _me(container), _idx(idx) {}
