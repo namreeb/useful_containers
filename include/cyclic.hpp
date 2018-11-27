@@ -35,31 +35,25 @@
 
 namespace nam
 {
-template <typename T, std::size_t N> class cyclic;
-
-template <typename CyclicEntryT, std::size_t N, bool is_const>
+template <typename CyclicT, bool is_const>
 class CyclicIterator
 {
 private:
-    friend class nam::cyclic<CyclicEntryT, N>;
-    friend class CyclicIterator<CyclicEntryT, N, !is_const>;
+    friend CyclicT;
+    friend class CyclicIterator<CyclicT, !is_const>;
 
-    std::conditional_t<is_const,
-        const nam::cyclic<CyclicEntryT, N>,
-        nam::cyclic<CyclicEntryT, N>
-    > *_me;
+    std::conditional_t<is_const, const CyclicT, CyclicT>*  _me;
 
     std::size_t _idx;
 
-    CyclicIterator(std::conditional_t<is_const,
-        const nam::cyclic<CyclicEntryT, N>,
-        nam::cyclic<CyclicEntryT, N>
-        > *container, std::size_t idx) noexcept : _me(container), _idx(idx) {}
+    CyclicIterator(std::conditional_t<is_const, const CyclicT, CyclicT>* container, std::size_t idx) noexcept : _me(container), _idx(idx) {}
 
 public:
-    using value_type = CyclicEntryT;
+    using value_type = typename CyclicT::value_type;
+    using difference_type = std::ptrdiff_t;
     using pointer = std::conditional_t<is_const, const value_type, value_type>*;
     using reference = std::conditional_t<is_const, const value_type, value_type>&;
+    using iterator_category = std::input_iterator_tag;
 
     reference operator*() const
     {
@@ -86,7 +80,7 @@ public:
     {
         _me = other._me;
         _idx = other._idx;
-
+        return *this;
     }
 };
 
@@ -102,8 +96,8 @@ public:
     using value_type = T;
     using reference = T&;
     using const_reference = const T&;
-    using iterator = CyclicIterator<T, N, false>;
-    using const_iterator = CyclicIterator<T const, N, true>;
+    using iterator = CyclicIterator<cyclic, false>;
+    using const_iterator = CyclicIterator<cyclic const, true>;
 
     cyclic() : _filled(false), _curr(0u) {}
 
@@ -128,7 +122,7 @@ public:
     template <class... Args>
     void emplace_back(Args&&... args) noexcept
     {
-        new (&_raw[_curr]) T({ std::forward<Args>(args)... });
+        new (&_raw[_curr]) T(std::forward<Args>(args)...);
 
         if (_curr == N - 1)
         {
