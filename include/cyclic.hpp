@@ -168,12 +168,12 @@ public:
 
     iterator begin() noexcept
     {
-        return iterator(this, 0);
+        return iterator(this, static_cast<std::size_t>(0));
     }
 
     const_iterator begin() const noexcept
     {
-        return const_iterator(this, 0);
+        return const_iterator(this, static_cast<std::size_t>(0));
     }
 
     iterator end() noexcept
