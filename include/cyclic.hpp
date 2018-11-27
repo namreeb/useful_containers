@@ -31,6 +31,7 @@
 #include <array>
 #include <memory>
 #include <utility>
+#include <type_traits>
 
 namespace nam
 {
