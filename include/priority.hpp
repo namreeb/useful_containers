@@ -182,12 +182,12 @@ public:
 
     iterator end() noexcept
     {
-        return iterator(this, N);
+        return iterator(this, _curr);
     }
 
     const_iterator end() const noexcept
     {
-        return const_iterator(this, N);
+        return const_iterator(this, _curr);
     }
 };
 }

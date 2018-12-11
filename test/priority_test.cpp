@@ -32,6 +32,11 @@ int main()
     constexpr std::size_t count = 10;
     nam::priority<std::size_t, std::size_t, count> prio;
 
+    std::cout << "Empty iteration start..." << std::endl;
+    for (auto const &i : prio)
+        std::cout << "i: " << i << std::endl;
+    std::cout << "Empty iteration stop.  Should have been empty above." << std::endl;
+
     for (auto i = 0u; i < count/2; ++i)
         prio.insert(i, i);
 

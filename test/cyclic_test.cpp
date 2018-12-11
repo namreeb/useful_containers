@@ -72,6 +72,11 @@ int main()
     std::cout << "size() should be 0: " << cyc.size() << std::endl;
     std::cout << "empty() should be true: " << (cyc.empty() ? "true" : "false") << std::endl;
 
+    std::cout << "Empty iteration start..." << std::endl;
+    for (auto const &i : cyc)
+        std::cout << "i: " << i.str << std::endl;
+    std::cout << "Empty iteration stop.  Should have been empty above." << std::endl;
+
     const MyStruct x { 1, 2, "hithere" };
 
     cyc.push_back(x);
