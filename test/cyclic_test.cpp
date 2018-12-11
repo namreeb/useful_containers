@@ -79,9 +79,12 @@ int main()
 
     const MyStruct x { 1, 2, "hithere" };
 
-    cyc.push_back(x);
-    cyc.push_back(x);
-    cyc.push_back(x);
+    cyc.push_back({ 1, 2, "hithere" });
+    cyc.push_back({ 3, 4, "hithere" });
+    cyc.push_back({ 5, 6, "hithere" });
+
+    for (auto const &i : cyc)
+        std::cout << "first three i: " << i.a << std::endl;
 
     std::cout << "size() should be 3: " << cyc.size() << std::endl;
 

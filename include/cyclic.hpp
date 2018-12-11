@@ -144,7 +144,7 @@ public:
     reference operator[](std::size_t n)
     {
         // we don't want to use modulo here because not all values of n are considered safe
-        if ((n += _curr) >= N)
+        if (_filled && (n += _curr) >= N)
             n -= N;
 
         return _raw[n];
@@ -153,7 +153,7 @@ public:
     const_reference operator[](std::size_t n) const
     {
         // we don't want to use modulo here because not all values of n are considered safe
-        if ((n += _curr) >= N)
+        if (_filled && (n += _curr) >= N)
             n -= N;
 
         return _raw[n];
