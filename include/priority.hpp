@@ -114,7 +114,8 @@ public:
 
     priority() : _curr(0u) {}
 
-    void insert(P prio, const_reference elem) noexcept
+    template <class... Args>
+    void emplace(P prio, Args&&... args) noexcept
     {
         auto const idx = find_idx(prio);
 
@@ -122,26 +123,15 @@ public:
             return;
 
         shift(idx);
-        _raw[idx] = std::make_pair(prio, elem);
+        _raw[idx] = std::make_pair(prio, std::forward<Args>(args)...);
 
         if (_curr < N)
             ++_curr;
     }
 
-    void push_back(T&& val) noexcept
+    void insert(P prio, const_reference elem) noexcept
     {
-        emplace_back(std::move(val));
-    }
-
-    template <class... Args>
-    void emplace_back(Args&&... args) noexcept
-    {
-        new (&_raw[_curr]) T(std::forward<Args>(args)...);
-
-        if (_curr == N - 1)
-            _curr = 0;
-        else
-            ++_curr;
+        emplace(prio, elem);
     }
 
     void clear() noexcept
@@ -154,19 +144,11 @@ public:
 
     reference operator[](std::size_t n)
     {
-        // we don't want to use modulo here because not all values of n are considered safe
-        if ((n += _curr) >= N)
-            n -= N;
-
         return _raw[n].second;
     }
 
     const_reference operator[](std::size_t n) const
     {
-        // we don't want to use modulo here because not all values of n are considered safe
-        if ((n += _curr) >= N)
-            n -= N;
-
         return _raw[n].second;
     }
 
