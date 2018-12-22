@@ -27,28 +27,55 @@
 
 #include <iostream>
 
+struct MyClass
+{
+    int i;
+
+    MyClass() : i(0)
+    {
+        std::cout << "MyClass()" << std::endl;
+    }
+
+    MyClass(int _i) : i(_i)
+    {
+        std::cout << "MyClass(" << i << ")" << std::endl;
+    }
+
+    MyClass(const MyClass &other) : i(other.i)
+    {
+        std::cout << "MyClass() copy" << std::endl;
+    }
+};
+
 int main()
 {
     constexpr std::size_t count = 10;
-    nam::priority<std::size_t, std::size_t, count> prio;
+    nam::priority<MyClass, std::size_t, count> prio;
 
     std::cout << "Empty iteration start..." << std::endl;
     for (auto const &i : prio)
-        std::cout << "i: " << i << std::endl;
+        std::cout << "i: " << i.i << std::endl;
     std::cout << "Empty iteration stop.  Should have been empty above." << std::endl;
 
     for (auto i = 0u; i < count/2; ++i)
-        prio.insert(i, i);
+        prio.insert(i, static_cast<int>(i));
 
-    std::cout << "priority_test size(): " << prio.size() << std::endl;
-
-    for (auto i = count / 2; i < count; ++i)
-        prio.insert(i, i);
-
-    std::cout << "size(): " << prio.size() << std::endl;
+    std::cout << "priority_test size(): " << prio.size() << " (should be 5) dumping..." << std::endl;
 
     for (auto const &i : prio)
-        std::cout << "i: " << i << std::endl;
+        std::cout << "i: " << i.i << std::endl;
+
+    std::cout << "filling..." << std::endl;
+
+    for (auto i = count / 2; i < count; ++i)
+        prio.emplace(i, static_cast<int>(i));
+
+    prio.emplace(5u, 1234);
+
+    std::cout << "size(): " << prio.size() << " (should be 10)" << std::endl;
+
+    for (auto const &i : prio)
+        std::cout << "i: " << i.i << std::endl;
 
     auto a = prio.begin();
     auto b = prio.end();
